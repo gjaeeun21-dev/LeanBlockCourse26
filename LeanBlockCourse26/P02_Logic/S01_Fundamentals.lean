@@ -492,7 +492,7 @@ example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
   sorry
 
 -- Exercise 3.2
--- Shows how to use `rw` to prove that if `P` and `Q` are equivalent, and `Q` and `R`
--- are equivalent, then `P` and `R` are equivalent (transitivity of `↔`)
+-- Shows how to use `rw` to prove that if `Q` and `P` are equivalent, then
+-- `P` implies `Q` (modus tollens of `↔`)
 example (P Q : Prop) (h : Q ↔ P) : P → Q := by
   sorry
