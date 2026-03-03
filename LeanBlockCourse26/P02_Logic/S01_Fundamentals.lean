@@ -543,3 +543,158 @@ example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p :
 example (P Q R S : Prop) (h₁ : P ↔ Q) (h₂ : R ↔ Q) (h₃ : R ↔ S) (p : P) : S :=
   h₃.mp <| h₂.mpr <| h₁.mp p
 
+/-
+# Term Mode and Direct Construction
+
+Lean proofs (indicated by `:=`) can be written directly as terms,
+without tactics. This gives us two distinct styles of proving:
+
+1. Tactic Mode (using `by`)
+   - More interactive and easier to write
+   - More flexible and maintainable
+   - Can be slower to compile
+   - Can be less transparent about what's happening
+
+2. Term Mode (direct construction)
+   - Often more concise for simple proofs
+   - More explicit and faster to compile
+   - Can be more brittle to changes in mathlib
+   - Harder or impossible to write for complex proofs
+   - Can be challenging to read for complex proofs
+
+You can see how your tactic proof translates to term mode using:
+`#print name_of_your_theorem` though there are some nuances that
+will become more clear when discussing quantifiers.
+
+Some common patterns:
+- `by exact p` becomes just `p`
+- `by intro p; exact f p` becomes `fun p => f p`
+- `by intro p; exact p` becomes `fun p => p` or simply `id`
+- `by rw [h₁] at p; exact p` becomes `(h₁ ▸ p)
+
+The last one only works for equality (`=`) in `h₁`, not for equivalence (`↔`).
+Note that `\t` produces the unicode symbol `▸` and that `\mapsto` produces
+`↦` and is another way of writing `=>`.
+
+Around 100,000 proofs out of 320,000 in mathlib are written in tactic mode,
+though this includes proofs of minor facts where term mode is more appropriate.
+-/
+
+-- This is a proof in tactic mode because of `by` (and the usage of `assumption`)
+lemma id_proof (P Q : Prop) (p : P) (q : Q) : P := by
+  assumption -- or `exact p`
+
+-- You can print the term mode proof using `#print`, which will show
+-- you that the proof in term mode is just `fun P Q p q ↦ p`
+#print id_proof
+
+-- But it also modified the statement from
+-- `(P Q : Prop) (p : P) (q : Q) : P` to a flat
+-- `∀ (P Q : Prop), P → Q → P` type. So this does not work:
+--
+-- ```
+-- lemma id_proof_term (P Q : Prop) (p : P) (q : Q) : P :=
+--   fun P Q p q ↦ p
+-- ```
+--
+-- Lean actually takes all the arguments (things to the left of `:`) and
+-- `reverts` them into the goal before formulating the term mode proof
+
+-- But this does:
+lemma id_proof_term (P Q : Prop) (p : P) (q : Q) : P := p
+
+-- And this does:
+lemma id_proof_term' : ∀ (P Q : Prop), P → Q → P := 
+  fun _ _ p _ => p -- or `fun P Q p q => p`
+ 
+-- Same output (up to renamed variables) as `#print id_proof`
+#print id_proof_term
+#print id_proof_term'
+
+
+-- Let us look at the identity function in various styles.
+
+-- First in tactic mode with `intro`
+lemma identity_tactic_intro (P : Prop) : P → P := by
+  intro p
+  assumption -- or `exact p`
+
+#print identity_tactic_intro -- gives term `fun P p ↦ p`
+
+
+-- Second in tactic mode, but cheating with `id`
+lemma identity_tactic_id (P : Prop) : P → P := by
+  exact id
+
+#print identity_tactic_id  -- gives term `fun P ↦ id`
+
+
+-- Third in term mode with a lambda function -- first syntax
+lemma identity_term_lambda (P : Prop) : P → P := fun p => p
+
+#print identity_term_lambda -- gives term `fun P p ↦ p`
+
+
+-- Third in term mode with a lambda function -- second syntax
+-- Note that `λ` is marked as deprecated by linter
+lemma identity_term_lambda' (P : Prop) : P → P := λ p ↦ p
+
+#print identity_term_lambda' -- gives term `fun P p ↦ p`
+
+
+-- Finally, this is actually just the identity function `id`
+lemma identity_term_id (P : Prop) : P → P := id
+
+#print identity_term_id  -- gives term `fun P ↦ id`
+
+
+-- `rfl` confirms these are all truly "the same" ...
+example : identity_term_id = identity_tactic_id := rfl
+example : identity_tactic_intro = identity_term_lambda := rfl
+
+-- ... even these (despite print looking looking different)!
+example : identity_tactic_intro = identity_tactic_id := rfl
+example : identity_term_id = identity_term_lambda := rfl
+
+-- Sometimes `rw` can be expressed in term mode through `▸`.
+-- So this trivial tactic mode proof ...
+example (P Q R : Prop) (h₁ : Q = P) (h₂ : Q ↔ R) : P ↔ R := by
+  rw [h₁] at h₂
+  exact h₂
+
+-- ... can become this term mode proof:
+example (P Q R : Prop) (h₁ : Q = P) (h₂ : Q ↔ R) : P ↔ R :=
+  h₁ ▸ h₂
+
+-- Note: `rw` applied to the goal is not really something you can
+-- do in term mode because the whole idea of modifying the goal and
+-- "arguing backwards" is at odds with functional programming:
+-- this is why tactic mode exists, to give mathematicians the
+-- convenience of arguing from the back towards to assumptions.
+-- Behind the scenes this still gets translated into forward
+-- arguing function calls.
+
+/-
+# Exercise Block 4
+
+Turn all of the previous exercises into term mode proofs.
+-/
+
+-- Exercise 4.1
+-- Chain three implications together: if we can go from `P` to `Q` to `R` to `S`,  then `P → S`
+example (P Q R S : Prop) (h₁ : P → Q) (h₂ : Q → R) (h₃ : R → S) : P → S := sorry
+
+
+-- Exercise 4.2
+-- Nested implications: if `P` implies `(Q → R)` and `P` implies `Q`, then `P` implies `R`
+example (P Q R : Prop) (h₁ : P → Q → R) (h₂ : P → Q) : P → R := sorry
+
+
+-- Exercise 4.3 (Master)
+-- Try turning this tactic mode proof into term mode, first without using
+-- `#print' and then using it
+example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := by
+  rw [h₁.symm] at h₂
+  exact h₂
+
+example (P Q R : Prop) (h₁ : P ↔ Q) (h₂ : Q ↔ R) : P ↔ R := sorry
