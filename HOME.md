@@ -28,6 +28,11 @@ Completion of Analysis I and Linear Algebra I should provide a sufficient mathem
 
 Participants need to **bring a laptop** to follow along and work on exercises. The course will be **conducted in English**, but Bachelor students taking the course as part of their ABV requirements may express themselves in German if they prefer.
 
+## Announcements
+
+<!-- begin announcements -->
+<!-- end announcements -->
+
 ## Navigation
 
 - **[Course Outline](OUTLINE.md)** — parts, sections, slides, and exercises
@@ -35,4 +40,3 @@ Participants need to **bring a laptop** to follow along and work on exercises. T
 - **[Unicode Input](UNICODE.md)** — backslash commands for all symbols used in the course
 - **[Tactic Reference](TACTICS.md)** — every tactic used in the course, by section
 - **[Resources](RESOURCES.md)** — textbooks, documentation, talks, and games
-- **[Log](LOG.md)** — announcements and updates

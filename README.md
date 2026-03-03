@@ -11,3 +11,8 @@ Taught by [Christoph Spiegel](https://christophspiegel.berlin) (ZIB) with [Silas
 **When:** March 2–13, 2026, daily 9:30–12:30 and 14:00–17:00
 
 **Where:** Seminarraum 119 (A3/SR 119), Arnimallee 3, FU Berlin Dahlem Campus
+
+## Announcements
+
+- **2026-03-03:** Tomorrow (Tuesday) we meet at **9:40** instead of 9:30.
+- **2026-03-02:** Uploaded slides for `P01_Introduction`.

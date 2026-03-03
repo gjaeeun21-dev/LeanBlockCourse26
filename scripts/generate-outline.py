@@ -2,7 +2,7 @@
 # /// script
 # requires-python = ">=3.11"
 # ///
-"""Generate OUTLINE.md from repo contents (slides, sections, exercise blocks)."""
+"""Generate OUTLINE.md and inject announcements into HOME.md."""
 
 import re
 from dataclasses import dataclass, field
@@ -12,6 +12,8 @@ ROOT = Path(__file__).resolve().parent.parent
 CODE_DIR = ROOT / "LeanBlockCourse26"
 SLIDES_DIR = ROOT / "lecture-slides"
 OUT = ROOT / "OUTLINE.md"
+HOME = ROOT / "HOME.md"
+README = ROOT / "README.md"
 
 GITHUB_BLOB = "https://github.com/FordUniver/LeanBlockCourse26/blob/main"
 
@@ -207,7 +209,37 @@ def generate() -> str:
     return "\n".join(lines)
 
 
+ANNOUNCE_RE = re.compile(
+    r"^## Announcements\n(.*?)(?=\n## |\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+BEGIN_MARKER = "<!-- begin announcements -->"
+END_MARKER = "<!-- end announcements -->"
+
+
+def inject_announcements() -> None:
+    """Extract ## Announcements from README.md and inject into HOME.md."""
+    readme = README.read_text()
+    m = ANNOUNCE_RE.search(readme)
+    if not m:
+        return
+
+    body = m.group(1).strip()
+
+    home = HOME.read_text()
+    begin = home.find(BEGIN_MARKER)
+    end = home.find(END_MARKER)
+    if begin == -1 or end == -1:
+        return
+
+    home = home[:begin + len(BEGIN_MARKER)] + "\n" + body + "\n" + home[end:]
+    HOME.write_text(home)
+
+
 if __name__ == "__main__":
     content = generate()
     OUT.write_text(content)
     print(f"Generated {OUT.relative_to(ROOT)}")
+
+    inject_announcements()
+    print(f"Injected announcements into {HOME.relative_to(ROOT)}")
