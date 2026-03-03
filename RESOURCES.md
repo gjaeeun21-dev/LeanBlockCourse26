@@ -1,3 +1,8 @@
+---
+title: Resources
+nav_order: 5
+---
+
 # Resources
 
 ## Documentation and Search

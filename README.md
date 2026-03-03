@@ -1,3 +1,9 @@
+---
+title: Home
+nav_order: 1
+permalink: /
+---
+
 # Formalized Math in LEAN – FUB Block Course 2026
 
 ## Announcements

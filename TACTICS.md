@@ -1,3 +1,8 @@
+---
+title: Tactics
+nav_order: 4
+---
+
 # Tactic Reference
 
 Tactics are commands used inside `by` blocks to construct proofs step by step. The tables below list every tactic used in this course, grouped by where it is first introduced. For detailed documentation, see the [Lean Tactic Reference](https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/).

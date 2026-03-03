@@ -1,0 +1,19 @@
+remote_theme: just-the-docs/just-the-docs
+
+title: Lean Block Course 2026
+description: Formalized Math in LEAN – FUB Block Course
+
+color_scheme: light
+
+aux_links:
+  GitHub: https://github.com/FordUniver/LeanBlockCourse26
+
+nav_enabled: true
+
+exclude:
+  - .lake/
+  - lakefile.toml
+  - lean-toolchain
+  - LeanBlockCourse26.lean
+  - LeanBlockCourse26/
+  - BlockCourse/

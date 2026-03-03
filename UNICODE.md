@@ -1,3 +1,8 @@
+---
+title: Unicode Input
+nav_order: 3
+---
+
 # Unicode Input
 
 In Lean files, type `\` followed by an abbreviation and press Space or Tab to insert a Unicode symbol. In VS Code, you can also hover over any symbol to see its abbreviation, or use `Ctrl+Shift+P` → "Lean 4: Show All Abbreviations" to browse the full list.

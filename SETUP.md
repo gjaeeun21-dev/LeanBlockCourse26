@@ -1,3 +1,8 @@
+---
+title: Setup
+nav_order: 2
+---
+
 # Setting Up a Lean Project
 
 This guide walks through the full setup for working with Lean 4 and Mathlib, from installing developer tools to compiling your first files.
