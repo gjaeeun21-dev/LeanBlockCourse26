@@ -1,6 +1,7 @@
 ---
 title: Setup
-nav_order: 3
+parent: Cheat Sheets
+nav_order: 1
 ---
 
 # Setting Up a Lean Project

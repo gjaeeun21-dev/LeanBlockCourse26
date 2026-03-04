@@ -157,7 +157,8 @@ def generate(
     lines = [
         "---",
         "title: Tactics",
-        "nav_order: 5",
+        "parent: Cheat Sheets",
+        "nav_order: 3",
         "---",
         "",
         "# Tactic Reference",
