@@ -10,9 +10,15 @@ import Lean
 
 open Lean Elab Command Term Meta
 
-/-- Count non-whitespace characters in a string -/
-def countNonWS (s : String) : Nat :=
-  s.toList.filter (!·.isWhitespace) |>.length
+/-- Count non-whitespace characters, ignoring `;` (tactic separator) but keeping `<;>` (combinator) -/
+def golfScore (s : String) : Nat :=
+  go s.toList 0
+where
+  go : List Char → Nat → Nat
+    | '<' :: ';' :: '>' :: rest, n => go rest (n + 3)
+    | ';' :: rest, n => go rest n
+    | c :: rest, n => go rest (if c.isWhitespace then n else n + 1)
+    | [], n => n
 
 /-- Recursively find a syntax node of a given kind -/
 partial def Lean.Syntax.findKind (stx : Syntax) (k : SyntaxNodeKind) : Option Syntax :=
@@ -69,7 +75,7 @@ elab "#golf " cmd:command : command => do
   let some endPos := proofStx.getTailPos?
     | logInfo "Could not get end position"; return
   let src := (Substring.Raw.mk fileMap.source startPos endPos).toString
-  let charScore := countNonWS src
+  let charScore := golfScore src
   -- Term-level measurement (only for named declarations)
   let termInfo ←
     if let some declName := getDeclName? cmd.raw then

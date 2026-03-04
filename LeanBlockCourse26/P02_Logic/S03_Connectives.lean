@@ -584,13 +584,9 @@ example (P Q R : Prop) : (P ∧ Q) ∨ R → P ∨ R :=
 
 /-
 # Exercise Block B02
-Try to get the proof with the fewest non-whitespace characters possible! You can use:
-
-```
-#eval ("
-<insert your proof here>
-").toList.filter (!·.isWhitespace) |>.length 
-```
+Try to get the proof with the fewest characters possible! Wrap your proof
+with `#golf` to measure it automatically — it counts non-whitespace characters,
+ignoring `;` (since it is equivalent to a newline) but counting `<;>`.
 
 Hint: try `rintro` with nested structures
 
@@ -599,10 +595,10 @@ parses as `(P ∧ R) ∨ ((P ∧ S) ∨ ((Q ∧ R) ∨ (Q ∧ S)))`. This means
 `right; right; left` is needed to reach `Q ∧ R`, for instance.
 -/
 
--- Exercise 2.1 (🥉170 🥈150 🏅130)
+-- Exercise 2.1 (🥉160 🥈140 🏅110)
 
--- Under 170 characters 🥉
-example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
+-- 158 chars 🥉
+#golf example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
   intro pqrs
   obtain ⟨pq, rs⟩ := pqrs
   cases' pq with p q
@@ -613,8 +609,8 @@ example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) �
     · right; right; left; exact ⟨q, r⟩
     · right; right; right; exact ⟨q, s⟩
 
--- Under 150 characters 🥈
-example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
+-- 135 chars 🥈
+#golf example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
   intro ⟨pq, rs⟩
   cases' pq with p q
   all_goals cases' rs with r s
@@ -623,40 +619,31 @@ example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) �
   · right; right; left; exact ⟨q, r⟩
   · right; right; right; exact ⟨q, s⟩
 
--- Under 130 characters! 🏅
-example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
+-- 123 chars 🏅
+#golf example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
   rintro ⟨p | q, r | s⟩
   · exact Or.inl ⟨p, r⟩
   · exact Or.inr <| Or.inl ⟨p, s⟩
   · exact Or.inr <| Or.inr <| Or.inl ⟨q, r⟩
   · exact Or.inr <| Or.inr <| Or.inr ⟨q, s⟩
 
--- Exactly 101 characters! 🏅🏅
-example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
+-- 101 chars 🏅🏅
+#golf example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
   rintro ⟨p | q, r | s⟩
-  · left
-    exact ⟨p, r⟩
-  · right
-    left
-    exact ⟨p, s⟩
-  · right
-    right
-    left
-    exact ⟨q, r⟩
-  · right
-    right
-    right
-    exact ⟨q, s⟩ -- should have excluded `;` from the count as well...
+  · left; exact ⟨p, r⟩
+  · right; left; exact ⟨p, s⟩
+  · right; right; left; exact ⟨q, r⟩
+  · right; right; right; exact ⟨q, s⟩
 
 -- Or we could have cheated with `simp_all`...
-example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
+#golf example (P Q R S : Prop) : (P ∨ Q) ∧ (R ∨ S) → (P ∧ R) ∨ (P ∧ S) ∨ (Q ∧ R) ∨ (Q ∧ S) := by
   rintro ⟨p | q, r | s⟩
   all_goals simp_all -- we will learn about this technique later ...
 
--- Exercise 2.2 (🥉150 🥈130 🏅100)
+-- Exercise 2.2 (🥉130 🥈100 🏅70)
 
--- Exactly 124 characters... 🥈
-example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
+-- 124 chars 🥉
+#golf example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
   rintro ⟨h | r, s⟩
   constructor
   · left
@@ -673,8 +660,8 @@ example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) �
         exact r
       · exact s
 
--- ... and if you accept the broken linter you can even get down to 122 characters
-example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
+-- 122 chars — if you accept the broken linter you can skip some `·` focusing
+#golf example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
   rintro ⟨h | r, s⟩
   constructor
   · left
@@ -691,8 +678,8 @@ example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) �
       exact r
     · exact s
 
--- Under 100 characters 🏅
-example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
+-- 95 chars 🥈
+#golf example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
   rintro ⟨⟨p, q⟩ | r, s⟩
   · constructor
     · left; exact p
@@ -701,13 +688,14 @@ example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) �
       · exact s
   · exact ⟨Or.inr r, Or.inr r, s⟩
 
--- 67 characters 🏅🏅
-example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
+-- 67 chars 🏅
+#golf example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S := by
   rintro ⟨⟨p, q⟩ | r, s⟩
   · exact ⟨Or.inl p, Or.inl q, s⟩
   · exact ⟨Or.inr r, Or.inr r, s⟩
 
-example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S :=
+-- Term mode (85 chars)
+#golf example (P Q R S : Prop) : ((P ∧ Q) ∨ R) ∧ S → (P ∨ R) ∧ (Q ∨ R) ∧ S :=
   fun ⟨pqr, s⟩ ↦ match pqr with
   | Or.inl ⟨p, q⟩ => ⟨Or.inl p, Or.inl q, s⟩
   | Or.inr r => ⟨Or.inr r, Or.inr r, s⟩
