@@ -140,4 +140,180 @@ example (A B C D E F G H I : Prop)
     (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
     (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
     (q : H → G) (r : H → I) (a : A) : I := by
+  have b : B := f a
+  have e : E := i b
+  have f : F := l e
+  have i : I := p f
+  exact i
+
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
+  have b := f a -- output type is inferred / determined by the term mode proof
+  have e := i b -- output type is inferred / determined by the term mode proof
+  have f := l e -- output type is inferred / determined by the term mode proof
+  have i := p f -- output type is inferred / determined by the term mode proof
+  exact i
+
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I :=
+  p <| l <| i <| f a  -- Can just collapse everything into term mode
+
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
+  apply p
+  apply l
+  apply i
+  apply f
+  exact a
+
+-- mixed reasoning: argue backwards from `I` to `E` and then forwards from `A`
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
+  apply p
+  apply l
+  exact i (f a)
+
+/-
+## Forgetting about assumptions with `clear`
+
+The `clear` tactic lets you forget assumptions. You should generally not need
+this and instead structure your code to only have necessary assumptions in scope.
+-/
+
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
+  clear g h j k m n q r      -- The linter still complains though
+  exact p <| l <| i <| f a
+
+/-
+## The `suffices` Tactic
+
+Enables explicit backward reasoning by declaring intermediate goals:
+
+1. Declares a subgoal that would suffice to prove the original goal
+2. Once proven, provides access to the subgoal proof via `this`
+3. Maintains goal context for clearer proof structuring
+
+This tactic is used around 2,600 times in mathlib. But it is very nice
+in that mimicks the human language "it suffices to show that ... because ...".
+-/
+
+-- Basic suffices example showing goal transformation
+example (P Q R : Prop) (h₁ : P → Q) (h₂ : Q → R) (p : P) : R := by
+  suffices Q by  -- unlike `apply h₂` the result is already visible in code
+    -- At this point we have entered a sub-proof where we show that it does
+    -- in fact suffice to show Q, similar to how `have` has its own sub-proof.
+    -- In this sub-proof the actual assumption you are claiming suffices is
+    -- introduced as `this`. Note that the term `this` (if not used as an
+    -- actual variable name as it us here) also refers the last unnamed variable.
+    exact h₂ this
+  exact h₁ p
+
+/-
+Unlike for example `have`, the tactic `suffices` only supports term mode
+proofs, i.e., it always needs the `by` and does not use the `:=` proof indicator.
+-/
+
+-- Compare with equivalent `apply`
+example (P Q R : Prop) (h₁ : P → Q) (h₂ : Q → R) (p : P) : R := by
+  apply h₂
+  exact h₁ p
+
+-- You can actually name the hypothesis in `suffices`
+example (P Q R : Prop) (h₁ : P → Q) (h₂ : Q → R) (p : P) : R := by
+  suffices q : Q by
+    exact h₂ q
+  exact h₁ p
+  
+/-
+## The `refine` Tactic
+
+The `refine` tactic behaves like `exact` but permits placeholders (i.e. `?_`)
+in the provided term. Any unsolved hole that is not fixed by unification with
+the main goal's target is converted into a new goal. This tactic is used
+around 19,000 times in mathlib.
+-/
+
+example (P Q : Prop) (f : P → Q) (p : P) : Q := by
+  refine f ?_  -- in this case it behaves like `apply`
+  exact p      -- this answers a sub-goal raised `_?`
+
+example (P Q : Prop) (f : P → Q) (p : P) : Q := by
+  refine f p   -- in this case it behaves like `exact`
+
+-- You can also stack proofs inside proofs for `refine`
+example (P Q : Prop) (f : P → Q) (p : P) : Q := by
+  refine f (by exact p)
+
+-- In fact this also works for `exact`
+example (P Q : Prop) (f : P → Q) (p : P) : Q := by
+  exact f (by exact p)
+
+/-
+## Tactics are just "syntactic sugar" to make mathematician's live easier
+
+At its core everything is term mode forward arguing compositing of methods,
+but tactics allow you to argue closer to natural language. This inherently
+will mean there are many equivalent ways of achieving the same goal
+and there will always some weirdness and inconsistencies because of that
+flexibility.
+
+## Notational inconsistencies
+
+Unfortunately the syntax of mathlib tactics is not entirely
+consistent, so in particular `:=` is not always used to signal
+the start of a sub-proof (`let` and `have` use it, `refine` and
+`suffices` do not) and just because one tactic admits a certain
+syntax, another does not necessarily allow the same, so the 
+following are all *invalid* for `suffices`:
+
+* suffices Q                   -- just leave argument open
+* suffices Q by ?_             -- leave an intentional gap
+* suffices Q := exact h₂ this  -- use term mode
+
+## Whitespace (indentation and newlines)
+
+Indentation does not matter (since lean / mathlib 4), but you
+can use it freely to structure your proofs and indicate when
+you are in a sub-proof. Newlines matter, but as in many languages,
+you can replace them with `;`, e.g.:
+-/
+
+example (P Q R : Prop) (h₁ : P → Q) (h₂ : Q → R) (p : P) : R :=
+  by apply h₂; exact h₁ p
+
+
+/-
+## Exercise Block B02: Graph of Implications (Continued)
+-/
+
+-- Use only `suffices` to work backwards from the goal:
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
+  sorry
+
+-- Use only `refine` to work backwards from the goal:
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
+  sorry
+
+-- Combine all of `clear`, `exact`, `have`, `suffices`, `refine`, and `apply`
+example (A B C D E F G H I : Prop)
+    (f : A → B) (g : C → B) (h : A → D) (i : B → E) (j : C → F)
+    (k : E → D) (l : E → F) (m : G → D) (n : H → E) (p : F → I)
+    (q : H → G) (r : H → I) (a : A) : I := by
   sorry
