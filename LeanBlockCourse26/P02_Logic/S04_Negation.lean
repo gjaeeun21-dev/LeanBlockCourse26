@@ -336,13 +336,55 @@ accessing classical axioms when needed.
 -- Prove this constructively, i.e., using intuitionistic logic
 -- and verify no axioms were used with `#print axioms _`
 theorem exercise_2_1_constructive (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
-  sorry
+  intro h₁ h₂ h₃
+  let hor := h₁ h₃
+  contradiction
+
+example (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
+  intro h₁ h₂ p
+  exact h₂ (h₁ p)
+
+example (P Q : Prop) : (P → Q) → (¬Q → ¬P) :=
+  fun h₁ h₂ p => h₂ (h₁ p)
+
+#print axioms exercise_2_1_constructive -- no axioms used
 
 -- Exercise 2.2
 -- Prove this using classical logic and verify that you
 -- used `Classical.choice` with `#print axioms _`
 theorem exercise_2_2_classical (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
-  sorry
+  intro pq nq p
+  have := Classical.em Q
+  rcases this with (q | nq)
+  · exact nq q
+  · exact nq (pq p)
+
+#print axioms exercise_2_2_classical -- propext, Classical.choice, Quot.sound
+
+#golf theorem exercise_2_2_classical' (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
+  intro h nq
+  by_cases p : P
+  · exfalso; exact nq (h p)
+  · exact p
+
+#print axioms exercise_2_2_classical' -- propext, Classical.choice, Quot.sound
+
+
+-- A neat notational trick: `‹P›` looks for any proof of `P` in your assumptions
+#golf theorem exercise_2_2_classical'' (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
+  intro _ _
+  by_cases P
+  · exfalso; exact ‹¬Q› (‹P → Q› ‹P›)
+  · exact ‹¬P›
+
+-- `by_contra` is intelligent about not applying `Classical.em` when applied to `¬P`
+theorem exercise_2_2_not_quite_classical (P Q : Prop) : (P → Q) → (¬Q → ¬P) := by
+  intro pq nq
+  by_contra p
+  let h := pq p
+  contradiction
+
+#print axioms exercise_2_2_not_quite_classical -- no axioms used
 
 /-
 ## Exercise Block B03
