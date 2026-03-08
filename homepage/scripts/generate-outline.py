@@ -354,6 +354,7 @@ def inject_announcements() -> None:
     announcements = parse_announcements()
     if not announcements:
         return
+    announcements.sort(key=lambda a: (a.d, a.timestamp or datetime.min.replace(tzinfo=BERLIN)), reverse=True)
 
     cutoff = datetime.now(tz=BERLIN) - timedelta(hours=RECENT_HOURS)
 
