@@ -1,7 +1,7 @@
 ---
 title: "let vs have in tactic mode"
 parent: Addendum
-nav_order: 9996
+nav_order: 2
 ---
 
 # `let` vs `have` in tactic mode

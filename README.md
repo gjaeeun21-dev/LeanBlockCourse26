@@ -7,7 +7,7 @@ A two-week intensive course on formalized mathematics in Lean 4, held March 2–
 ## Announcements
 
 - **2026-03-08:** Updated P02 and P03 exercise files: named theorems are now `example`, with `#check` pointers to the corresponding Mathlib names. Use the Mathlib names in your proofs.
-- **2026-03-08:** New addendum: [`theorem`, `lemma`, `example`, `def`](https://forduniver.github.io/LeanBlockCourse26/addendum/2026-03-08-theorem-lemma-example-def).
+- **2026-03-08:** New addendum: [`theorem` vs `lemma`](https://forduniver.github.io/LeanBlockCourse26/addendum/2026-03-08-theorem-lemma-example-def).
 - **2026-03-08:** New addendum: [`let` vs `have` in tactic mode](https://forduniver.github.io/LeanBlockCourse26/addendum/2026-03-08-let-vs-have).
 - **2026-03-05:** Since we went over by 10 minutes, the afternoon session starts at **14:10** instead of 14:00.
 - **2026-03-05:** New addendum: [When `·` focusing is optional](https://forduniver.github.io/LeanBlockCourse26/addendum/2026-03-05-dot-focusing).
