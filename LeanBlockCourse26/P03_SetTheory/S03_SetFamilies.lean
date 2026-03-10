@@ -40,7 +40,7 @@ example (S : Set α) (F : Set (Set α)) (h₁ : S ∈ F) : ⋂₀ F ⊆ S := by
 
 example (S : Set α) (F : Set (Set α)) (h₁ : S ∈ F) : ⋂₀ F ⊆ S := fun _ h => h S h₁
 
-#check Set.sInter_subset_of_mem
+-- #check Set.sInter_subset_of_mem
 
 example (F G : Set (Set α)) (h₁ : F ⊆ G) : ⋂₀ G ⊆ ⋂₀ F := by
   intro x h₂
@@ -70,7 +70,7 @@ example (S : Set α) (F : Set (Set α)) (h₁ : S ∈ F) : S ⊆ ⋃₀ F := by
 
 example (S : Set α) (F : Set (Set α)) (h₁ : S ∈ F) : S ⊆ ⋃₀ F := fun _ xs => ⟨S, h₁, xs⟩
 
-#check Set.subset_sUnion_of_mem
+-- #check Set.subset_sUnion_of_mem
 
 example (F G : Set (Set α)) (h₁ : F ⊆ G) : ⋃₀ F ⊆ ⋃₀ G := by
   intro x h
