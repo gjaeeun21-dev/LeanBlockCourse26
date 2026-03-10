@@ -138,7 +138,7 @@ theorem zero_add (n : MyNat) : 0 + n = n := by
 **Remark 1:** `0` without any additional context will be interpreted as `Nat.zero`.
 If there is additional `MyNat` context around it, type inference will be able
 to understand that this should actually instead be `MyNat.zero`. If you should
-run into issues where this does *not*  work, you can explicitly specify the
+run into issues where this does *not* work, you can explicitly specify the
 type as usual through `(0 : MyNat)`.
 
 **Remark 2:** If you encounter `MyNat.zero` but want to apply a theorem that
@@ -150,22 +150,38 @@ can rewrite.
 theorem zero_zero : 0 = MyNat.zero := rfl
 
 -- Exercise 2.1
+-- By induction on `m`. For the base case, both sides simplify to `succ n`.
+-- For the inductive step, `succ n + S(m) = S(succ n + m)` by definition of
+-- addition, which equals `S(succ(n + m))` by the inductive hypothesis, and
+-- this is `succ(n + S(m))` again by definition of addition.
 theorem succ_add (n m : MyNat) : succ n + m = succ (n + m) := by
   sorry
 
 -- Exercise 2.2 – Commutativity
+-- By induction on `m`. The base case `n + 0 = 0 + n` holds by `add_zero`
+-- and `zero_add`. For the inductive step, `n + S(m) = S(n + m)` by definition,
+-- which equals `S(m + n)` by the inductive hypothesis, and this is
+-- `S(m) + n` by `succ_add`.
 theorem add_comm (n m : MyNat) : n + m = m + n := by
   sorry
 
 -- Exercise 2.3 – Associativity
+-- By induction on `k`. The base case is immediate. For the inductive step,
+-- `(n + m) + S(k) = S((n + m) + k)` by definition, which equals
+-- `S(n + (m + k))` by the inductive hypothesis, and this is
+-- `n + S(m + k) = n + (m + S(k))` by definition.
 theorem add_assoc (n m k : MyNat) : (n + m) + k = n + (m + k) := by
   sorry
 
 -- Exercise 2.4 – Right commutativity
+-- By associativity, `(n + m) + k = n + (m + k)`. By commutativity of the
+-- inner sum, `n + (m + k) = n + (k + m)`. By associativity again,
+-- `n + (k + m) = (n + k) + m`.
 theorem add_right_comm (n m k : MyNat) : n + m + k = n + k + m := by
   sorry
 
 -- Exercise 2.5 (Master)
+-- Follows directly from the injectivity of the successor (seventh Peano axiom).
 example (n m : MyNat) (h : succ (n + 37) = succ (m + 42)) : n + 37 = m + 42 := by
   sorry
 
