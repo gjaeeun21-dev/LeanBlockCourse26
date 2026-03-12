@@ -1,8 +1,9 @@
 import Mathlib.Combinatorics.SimpleGraph.Basic
 import Mathlib.Combinatorics.SimpleGraph.Finite
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Finset.Basic
-import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Data.Finset.Card
 
 /-
 ## Handshaking lemma: the sum of the degrees in a graph is twice the number of its edges
@@ -99,6 +100,11 @@ variable {V : Type*} (G : SimpleGraph V)
 -- ... with the following finiteness and decidability assumptions giving you ...
 variable [Fintype V] [DecidableRel G.Adj]
 
+-- ... and we can also define some nice clean Notation
+local notation "#E" => G.edgeFinset.card -- this should actually work out of the box ...
+local notation "E" => G.edgeFinset
+local notation "d(" v ")" => G.degree v
+
 /-
 A first attempt after stating `[Fintype V]` and noting that both `G.edgeFinset`
 and `G.degree v` complain, might have been to also require `[Fintype G.edgeSet]`
@@ -114,7 +120,7 @@ arbitrary graph, making the lemma generally valid in classical logic.
 -/ 
 
 -- ... access to sums over `Fintype`s or `Finset`s so we can state ...
-lemma handshaking : ∑ v, G.degree v = 2 * G.edgeFinset.card := by
+lemma handshaking : ∑ v, d(v) = 2 * #E := by
   sorry
 
 /-
