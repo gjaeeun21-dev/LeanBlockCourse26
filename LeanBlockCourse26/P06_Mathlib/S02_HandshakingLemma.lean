@@ -99,7 +99,7 @@ theorems about it from `Mathlib.Algebra.Order.BigOperators.Ring.Finset`
 variable {V : Type*} (G : SimpleGraph V)
 
 -- ... with the following finiteness and decidability assumptions giving you ...
-variable [Fintype V] [DecidableRel G.Adj]
+variable [Fintype V] [DecidableRel G.Adj] [DecidableEq V]
 
 -- ... and we can also define some nice clean Notation
 local notation "#E" => G.edgeFinset.card -- this should actually work out of the box ...
@@ -210,11 +210,25 @@ The main ingredients are:
   * `G.card_incidenceFinset_eq_degree : # (G.incidenceFinset v) = d(v)`
 -/
 
-
-
 /-
 # Phase 5: Implement your fleshed out proof as closely as possible in lean
 -/
 
-lemma handshaking : ∑ v, d(v) = 2 * #E := by
-  sorry
+lemma handshaking : ∑ v : V, G.degree v = 2 * (Finset.card G.edgeFinset) := by
+  
+  have h₂ : ∑ _ ∈ G.edgeFinset, 2 = 2 * (Finset.card G.edgeFinset) := by
+    simp [Finset.sum_const, Nat.mul_comm]
+
+  have h₃ : ∀ e ∈ G.edgeFinset, Finset.card { v : V | v ∈ e } = 2 := by
+    intro e he
+    convert SimpleGraph.card_toFinset_mem_edgeFinset ⟨e, he⟩ using 2
+    ext; simp [Sym2.mem_toFinset]
+
+  have h₄ (v : V) : G.degree v = Finset.card { e ∈ E | v ∈ e } := by
+    simp [← G.card_incidenceFinset_eq_degree, G.incidenceFinset_eq_filter]
+    
+  calc  ∑ v : V, G.degree v 
+    _ = ∑ v : V, Finset.card {e ∈ G.edgeFinset | v ∈ e}  := by simp [h₄]
+    _ = ∑ e ∈ G.edgeFinset, Finset.card {v | v ∈ e}      := Finset.sum_card_bipartiteAbove_eq_sum_card_bipartiteBelow _
+    _ = ∑ e ∈ G.edgeFinset, 2                            := Finset.sum_congr rfl h₃
+    _ = 2 * Finset.card G.edgeFinset                     := h₂
