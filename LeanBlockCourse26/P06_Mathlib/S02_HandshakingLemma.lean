@@ -22,7 +22,7 @@ The *neighborhood* of a vertex `v` is defined as `N(v) = {u | u ~ v}`. Its
 *degree* `d(v) = #N(v)` is simply the cardinality of its neighborhood.
 The *incidence set* of a vertex `v` is defined as `I(v) = {e ∈ E | v ∈ e}`.
 
-**Handshake Lemma.** Given any finite simple graph `G = (V, E)`, the sum of the
+**Handshaking Lemma.** Given any finite simple graph `G = (V, E)`, the sum of the
 degrees of all its vertices equals twice its size, that is `Σ_v d(v) = 2 * #E`.
 -/
 
